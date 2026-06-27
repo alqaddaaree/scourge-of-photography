@@ -452,6 +452,11 @@
     .footer-link:hover { text-decoration: underline; }
 
     /* ─── Responsive ─────────────────────────────────── */
+    /* ─── Mobile nav strip ───────────────────────────── */
+    .mobile-nav {
+      display: none;
+    }
+
     @media (max-width: 800px) {
       .layout {
         grid-template-columns: 1fr;
@@ -464,12 +469,85 @@
         display: none;
       }
 
+      .mobile-nav {
+        display: block;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: var(--ink);
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+        overflow-x: auto;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .mobile-nav::-webkit-scrollbar {
+        height: 3px;
+      }
+      .mobile-nav::-webkit-scrollbar-track {
+        background: rgba(255,255,255,0.05);
+      }
+      .mobile-nav::-webkit-scrollbar-thumb {
+        background: var(--gold);
+        border-radius: 2px;
+      }
+      .mobile-nav { scrollbar-width: thin; scrollbar-color: var(--gold) rgba(255,255,255,0.05); }
+
+      .mobile-nav-inner {
+        display: flex;
+        gap: 0;
+        white-space: nowrap;
+        padding: 0 0.25rem;
+      }
+
+      .mobile-nav-item {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.1rem;
+        padding: 0.55rem 0.85rem;
+        text-decoration: none;
+        color: rgba(242,237,228,0.5);
+        border-bottom: 2px solid transparent;
+        transition: color 0.15s, border-color 0.15s;
+        flex-shrink: 0;
+      }
+
+      .mobile-nav-item:hover {
+        color: var(--parchment);
+      }
+
+      .mobile-nav-item.active {
+        color: var(--gold-light);
+        border-bottom-color: var(--gold);
+      }
+
+      .mobile-nav-roman {
+        font-family: var(--mono);
+        font-size: 0.6rem;
+        font-weight: 500;
+        color: var(--gold);
+        letter-spacing: 0.05em;
+      }
+
+      .mobile-nav-item.active .mobile-nav-roman {
+        color: var(--gold-light);
+      }
+
+      .mobile-nav-name {
+        font-family: var(--serif);
+        font-size: 0.75rem;
+        line-height: 1.2;
+      }
+
       .main-content {
         padding: 0 1.25rem 3rem;
         max-width: 100%;
       }
 
       .chapter { padding-top: 2.5rem; }
+
+      .entry { grid-template-columns: 2.8rem 1fr; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -509,6 +587,20 @@
     </div>
     <div id="search-count"></div>
   </header>
+
+  <!-- Mobile nav strip -->
+  <nav class="mobile-nav" aria-label="Chapter navigation">
+    <div class="mobile-nav-inner">
+      <a href="#section-0" class="mobile-nav-item active" data-section="0"><span class="mobile-nav-roman">I</span><span class="mobile-nav-name">Intro</span></a>
+      <a href="#section-1" class="mobile-nav-item" data-section="1"><span class="mobile-nav-roman">II</span><span class="mobile-nav-name">Technical</span></a>
+      <a href="#section-2" class="mobile-nav-item" data-section="2"><span class="mobile-nav-roman">III</span><span class="mobile-nav-name">Refutations</span></a>
+      <a href="#section-3" class="mobile-nav-item" data-section="3"><span class="mobile-nav-roman">IV</span><span class="mobile-nav-name">Scholarly</span></a>
+      <a href="#section-4" class="mobile-nav-item" data-section="4"><span class="mobile-nav-roman">V</span><span class="mobile-nav-name">Hadith</span></a>
+      <a href="#section-5" class="mobile-nav-item" data-section="5"><span class="mobile-nav-roman">VI</span><span class="mobile-nav-name">Practical</span></a>
+      <a href="#section-6" class="mobile-nav-item" data-section="6"><span class="mobile-nav-roman">VII</span><span class="mobile-nav-name">Resources</span></a>
+      <a href="#section-7" class="mobile-nav-item" data-section="7"><span class="mobile-nav-roman">VIII</span><span class="mobile-nav-name">Misc</span></a>
+    </div>
+  </nav>
 
   <!-- Sidebar TOC -->
   <nav class="sidebar" aria-label="Table of contents">
@@ -5169,6 +5261,7 @@ May Allāh reward you.</div>
 
   // ─── Active TOC item on scroll ────────────────────────
   const tocItems = document.querySelectorAll('.toc-item');
+  const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
   const sectionEls = document.querySelectorAll('.chapter');
 
   const observer = new IntersectionObserver((entries) => {
@@ -5177,6 +5270,13 @@ May Allāh reward you.</div>
         const id = entry.target.id;
         tocItems.forEach(item => {
           item.classList.toggle('active', item.getAttribute('href') === '#' + id);
+        });
+        mobileNavItems.forEach(item => {
+          const isActive = item.getAttribute('href') === '#' + id;
+          item.classList.toggle('active', isActive);
+          if (isActive) {
+            item.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+          }
         });
       }
     });
