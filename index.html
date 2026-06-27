@@ -27,6 +27,47 @@
       --mono:        "IBM Plex Mono", monospace;
     }
 
+    /* ─── Dark mode tokens ───────────────────────────── */
+    html.dark {
+      --parchment:   #171310;
+      --parchment-2: #1F1A16;
+      --ink:         #EDE6DA;
+      --ink-2:       #C8BFB2;
+      --ink-3:       #8A7E72;
+      --ink-4:       #5C5248;
+      --gold:        #C4973A;
+      --gold-light:  #DDB96A;
+      --gold-faint:  rgba(196,151,58,0.1);
+      --rule:        rgba(237,230,218,0.08);
+      --rule-strong: rgba(237,230,218,0.14);
+    }
+
+    /* ─── Theme toggle ───────────────────────────────── */
+    #theme-toggle {
+      position: absolute;
+      top: 1.25rem;
+      right: 1.5rem;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.14);
+      color: rgba(242,237,228,0.7);
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.35rem 0.75rem;
+      border-radius: 3px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    #theme-toggle:hover {
+      background: rgba(255,255,255,0.14);
+      color: var(--parchment);
+    }
+
     /* ─── Reset & Base ───────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     
@@ -63,8 +104,8 @@
     /* ─── Masthead ───────────────────────────────────── */
     .masthead {
       grid-column: 1 / -1;
-      background: var(--ink);
-      color: var(--parchment);
+      background: #1C1510;
+      color: #F2EDE4;
       padding: 3rem 3rem 2.5rem;
       position: relative;
       overflow: hidden;
@@ -88,7 +129,7 @@
       font-size: 0.7rem;
       letter-spacing: 0.18em;
       text-transform: uppercase;
-      color: var(--gold-light);
+      color: #D4A94A;
       margin-bottom: 0.6rem;
     }
 
@@ -97,7 +138,7 @@
       font-size: clamp(2rem, 4vw, 3.2rem);
       font-weight: 700;
       line-height: 1.15;
-      color: var(--parchment);
+      color: #F2EDE4;
       margin-bottom: 0.5rem;
     }
 
@@ -125,7 +166,7 @@
       font-family: var(--display);
       font-size: 1.5rem;
       font-weight: 700;
-      color: var(--gold-light);
+      color: #D4A94A;
       line-height: 1;
     }
 
@@ -152,14 +193,14 @@
       border-radius: 4px;
       font-family: var(--serif);
       font-size: 0.9rem;
-      color: var(--parchment);
+      color: #F2EDE4;
       outline: none;
       transition: border-color 0.2s, background 0.2s;
     }
 
     .search-wrap input::placeholder { color: rgba(242,237,228,0.35); }
     .search-wrap input:focus {
-      border-color: var(--gold);
+      border-color: #C4973A;
       background: rgba(255,255,255,0.1);
     }
 
@@ -564,6 +605,7 @@
 
   <!-- Masthead -->
   <header class="masthead">
+    <button id="theme-toggle" aria-label="Toggle dark mode"><span id="theme-icon">◑</span><span id="theme-label">Dark</span></button>
     <p class="masthead-eyebrow">Knowledge Base · Telegram Archive</p>
     <h1 class="masthead-title">The Scourge of Photography</h1>
     <p class="masthead-sub">Compiled writings on the ruling of tasweer of animate beings</p>
@@ -5208,6 +5250,26 @@ May Allāh reward you.</div>
 </div>
 
 <script>
+  // ─── Dark mode toggle ─────────────────────────────────
+  const html = document.documentElement;
+  const toggleBtn = document.getElementById('theme-toggle');
+  const themeIcon = document.getElementById('theme-icon');
+  const themeLabel = document.getElementById('theme-label');
+
+  function setDark(on) {
+    html.classList.toggle('dark', on);
+    themeIcon.textContent = on ? '◐' : '◑';
+    themeLabel.textContent = on ? 'Light' : 'Dark';
+    localStorage.setItem('theme', on ? 'dark' : 'light');
+  }
+
+  // Respect system preference or saved preference
+  const saved = localStorage.getItem('theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  setDark(saved === 'dark' || (!saved && prefersDark));
+
+  toggleBtn.addEventListener('click', () => setDark(!html.classList.contains('dark')));
+
   // ─── Progress bar ─────────────────────────────────────
   const bar = document.getElementById('progress-bar');
   function updateProgress() {
